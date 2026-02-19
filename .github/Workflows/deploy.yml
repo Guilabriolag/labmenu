@@ -1,0 +1,56 @@
+# .github/workflows/deploy.yml
+# No repo PRIVADO (labmenu-core)
+# Faz build e publica no repo PÚBLICO (labmenu)
+#
+# Secrets necessários no GitHub (Settings > Secrets):
+#   GH_TOKEN          → Personal Access Token com permissão repo
+#   CF_API_TOKEN      → Cloudflare API Token
+#   CF_ACCOUNT_ID     → Cloudflare Account ID
+
+name: Deploy LabMenu
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-frontend:
+    name: Publica Frontend (GitHub Pages)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copia arquivos para repo público
+        run: |
+          cp -r src/vitorelli/   deploy/vitorelli/
+          cp -r src/mctonny/     deploy/mctonny/
+          cp -r src/moraesgrill/ deploy/moraesgrill/
+
+      - name: Push para repo público
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.GH_TOKEN }}
+        with:
+          source-directory: deploy
+          destination-github-username: guilabriolag
+          destination-repository-name: labmenu
+          target-branch: gh-pages
+          commit-message: "Deploy automático — ${{ github.sha }}"
+
+  deploy-worker:
+    name: Publica Cloudflare Worker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install -g wrangler
+
+      - name: Deploy Worker
+        run: wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
