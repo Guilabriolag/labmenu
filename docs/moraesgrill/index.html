@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Moraes Grill — Cardápio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bg-layer"></div>
+<header class="site-header">
+    <div class="header-inner">
+        <div class="logo-placeholder">🔥</div>
+        <div>
+            <h1>MORAES GRILL</h1>
+            <p class="tagline">Rotisseria — Comida por Quilo</p>
+        </div>
+    </div>
+</header>
+<nav class="cat-nav">
+    <button class="cat-btn active" id="btn-carnes"   onclick="selecionar('carnes')">CARNES</button>
+    <button class="cat-btn"        id="btn-aves"     onclick="selecionar('aves')">AVES</button>
+    <button class="cat-btn"        id="btn-acomp"    onclick="selecionar('acomp')">ACOMPANHAMENTOS</button>
+    <button class="cat-btn"        id="btn-saladas"  onclick="selecionar('saladas')">SALADAS</button>
+    <button class="cat-btn"        id="btn-porcoes"  onclick="selecionar('porcoes')">PORÇÕES</button>
+    <button class="cat-btn"        id="btn-bebidas"  onclick="selecionar('bebidas')">BEBIDAS</button>
+</nav>
+<main class="grid" id="sabores"></main>
+<button class="cart-fab" onclick="toggleCarrinho()">🛒 <span id="cart-count">0</span></button>
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCarrinho()"></div>
+<aside class="cart-panel" id="carrinho">
+    <div class="cart-header">
+        <h2>MEU PEDIDO</h2>
+        <button class="btn-fechar" onclick="toggleCarrinho()">✕</button>
+    </div>
+    <div class="cart-top-actions">
+        <small>Revise seus itens:</small>
+        <button onclick="limparPedido()" class="btn-limpar">LIMPAR</button>
+    </div>
+    <textarea id="pedido" placeholder="Seu carrinho está vazio..."></textarea>
+    <div class="campo-obs">
+        <input type="text" id="obs" class="input-field" placeholder="Observações (opcional)">
+    </div>
+    <div class="total-box" id="totalBox" style="display:none;">
+        <span>TOTAL ESTIMADO</span>
+        <strong id="totalValor">R$ 0,00</strong>
+    </div>
+    <div class="entrega-grid">
+        <button id="btn-retirar" onclick="mostrarDados('retirar')" class="btn-entrega active">RETIRADA</button>
+        <button id="btn-delivery" onclick="mostrarDados('delivery')" class="btn-entrega">DELIVERY</button>
+    </div>
+    <div id="entregaCampos" style="display:none;">
+        <input type="text" id="endereco" class="input-field" placeholder="Endereço e Número">
+        <select id="bairro" class="input-field" onchange="calcularTotal()">
+            <option value="0">Selecione o Bairro (Taxa)</option>
+            <option value="5">CENTRO — R$ 5,00</option>
+            <option value="7">BAIRRO 2 — R$ 7,00</option>
+            <option value="10">BAIRRO 3 — R$ 10,00</option>
+        </select>
+    </div>
+    <select id="pagamento" class="input-field" onchange="mostrarTroco()">
+        <option value="">Forma de Pagamento</option>
+        <option value="Cartão">Cartão</option>
+        <option value="Pix">Pix</option>
+        <option value="Dinheiro">Dinheiro</option>
+    </select>
+    <input id="valorTroco" class="input-field" style="display:none;" type="number" placeholder="Troco para quanto?">
+    <button id="enviar" onclick="enviarPedido()">FINALIZAR NO WHATSAPP</button>
+</aside>
+<div id="alert-overlay" class="alert-overlay">
+    <div class="alert-box">
+        <h3 id="alert-title">AVISO</h3>
+        <p id="alert-msg"></p>
+        <button onclick="hideAlert()" class="btn-alert-ok">OK</button>
+    </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
