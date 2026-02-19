@@ -1,1 +1,18 @@
+# Cloudflare / Wrangler
+.wrangler/
+.dev.vars
+node_modules/
 
+# Arquivos sensíveis — NUNCA commitar
+*.env
+.env
+.env.local
+secrets.json
+tokens.json
+
+# IDs reais no wrangler.toml
+# Use wrangler.toml.example como template público
+
+# Sistema
+.DS_Store
+Thumbs.db
