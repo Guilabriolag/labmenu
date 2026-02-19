@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>McTonny — Cardápio Digital</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bg-layer"></div>
+
+<header class="site-header">
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEid451Ko1owcmZXRDAw47z-UD237K9HuBrGhVI_-1CBasexYPIMsobb7ZNKdaS8AfJqot4vuGP0amIOzfA5Dyfqm7PM7LBML4vqfAWnoaP3zsAj7kXI3Z58WiUdLqoJQUfqgayntHJ1agfD3lMEcwnw-1tWoF1GQwGBNXNy5JULv2c_FhcYr8oR69dkczN_/s1536/copilot_image_1766540362692.jpeg" alt="McTonny" class="logo">
+    <div>
+        <h1>McTONNY</h1>
+        <p class="tagline">Faça seu pedido</p>
+    </div>
+</header>
+
+<nav class="cat-nav">
+    <button class="cat-btn active" id="btn-lanches"   onclick="selecionar('lanches')">LANCHES</button>
+    <button class="cat-btn"        id="btn-mclanches" onclick="selecionar('mclanches')">MC / PRATO</button>
+    <button class="cat-btn"        id="btn-beirutes"  onclick="selecionar('beirutes')">BEIRUTES</button>
+    <button class="cat-btn"        id="btn-combos"    onclick="selecionar('combos')">COMBOS</button>
+    <button class="cat-btn"        id="btn-porcoes"   onclick="selecionar('porcoes')">PORÇÕES</button>
+    <button class="cat-btn"        id="btn-bebidas"   onclick="selecionar('bebidas')">BEBIDAS</button>
+</nav>
+
+<main class="grid" id="sabores"></main>
+
+<button class="cart-fab" onclick="toggleCarrinho()">
+    🛒 <span id="cart-count">0</span>
+</button>
+
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCarrinho()"></div>
+
+<aside class="cart-panel" id="carrinho">
+    <div class="cart-header">
+        <h2>MEU PEDIDO</h2>
+        <button class="btn-fechar" onclick="toggleCarrinho()">✕</button>
+    </div>
+    <div class="cart-top-actions">
+        <small>Revise seus itens:</small>
+        <button onclick="limparPedido()" class="btn-limpar">LIMPAR TUDO</button>
+    </div>
+    <textarea id="pedido" placeholder="Seu carrinho está vazio..."></textarea>
+
+    <div class="campo-obs">
+        <input type="text" id="obs" class="input-field" placeholder="Observações (sem cebola, tirar picles...)">
+    </div>
+
+    <div class="total-box" id="totalBox" style="display:none;">
+        <span>TOTAL ESTIMADO</span>
+        <strong id="totalValor">R$ 0,00</strong>
+    </div>
+
+    <div class="entrega-grid">
+        <button id="btn-retirar"  onclick="mostrarDados('retirar')"  class="btn-entrega active">VOU RETIRAR</button>
+        <button id="btn-delivery" onclick="mostrarDados('delivery')" class="btn-entrega">DELIVERY</button>
+    </div>
+
+    <div id="entregaCampos" style="display:none;">
+        <input type="text" id="endereco" class="input-field" placeholder="Rua, número e referência">
+        <select id="bairro" class="input-field" onchange="calcularTotal()">
+            <option value="0">Selecione o Bairro (Taxa)</option>
+            <option value="3">CENTRO — R$ 3,00</option>
+            <option value="3">JD BOM JESUS — R$ 3,00</option>
+            <option value="4">MORRO BRANCO — R$ 4,00</option>
+            <option value="10">GREEN HILLS — R$ 10,00</option>
+            <option value="3">VILA NOVA — R$ 3,00</option>
+            <option value="7">PAIOL / KM 50 — R$ 7,00</option>
+        </select>
+    </div>
+
+    <select id="pagamento" class="input-field" onchange="mostrarTroco()">
+        <option value="">Forma de Pagamento</option>
+        <option value="Pix">Pix</option>
+        <option value="Cartão">Cartão (Levamos a máquina)</option>
+        <option value="Dinheiro">Dinheiro</option>
+    </select>
+
+    <input id="valorTroco" class="input-field" style="display:none;" type="number" placeholder="Troco para quanto?">
+
+    <button id="enviar" onclick="enviarPedido()">✅ FINALIZAR NO WHATSAPP</button>
+</aside>
+
+<div id="alert-overlay" class="alert-overlay">
+    <div class="alert-box">
+        <h3 id="alert-title">AVISO</h3>
+        <p id="alert-msg"></p>
+        <button onclick="hideAlert()" class="btn-alert-ok">OK</button>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
