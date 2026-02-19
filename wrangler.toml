@@ -1,0 +1,32 @@
+# wrangler.toml — LabMenu Cloudflare Workers Config
+# ESTE ARQUIVO VAI NO REPO PRIVADO (labmenu-core)
+# Nunca commitar no repo público
+
+name = "labmenu-api"
+main = "workers/api.js"
+compatibility_date = "2024-01-01"
+
+# ── KV Namespaces ─────────────────────────────────────────────────
+# Crie os namespaces no painel Cloudflare: Workers > KV
+# Depois substitua os IDs abaixo pelos reais
+
+[[kv_namespaces]]
+binding = "CARDAPIOS"
+id = "SUBSTITUA_PELO_ID_REAL_CARDAPIOS"
+
+[[kv_namespaces]]
+binding = "ESTOQUE"
+id = "SUBSTITUA_PELO_ID_REAL_ESTOQUE"
+
+[[kv_namespaces]]
+binding = "CUPONS"
+id = "SUBSTITUA_PELO_ID_REAL_CUPONS"
+
+# ── Rotas ─────────────────────────────────────────────────────────
+# Após o DNS propagar, descomentar:
+# routes = [
+#   { pattern = "api.labriolag.shop/*", zone_name = "labriolag.shop" }
+# ]
+
+# ── Secrets (NUNCA aqui — usar: npx wrangler secret put ADMIN_TOKEN)
+# ADMIN_TOKEN → token secreto do painel admin
