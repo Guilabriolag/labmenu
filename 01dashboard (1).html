@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LabSystem ERP — Painel</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --bg2: #111318;
+  --bg3: #181b22;
+  --border: #1e2330;
+  --accent: #00d4ff;
+  --accent2: #f5a623;
+  --accent3: #00ff88;
+  --danger: #ff4757;
+  --text: #e8eaf0;
+  --text2: #7a8098;
+  --text3: #4a5068;
+  --sidebar-w: 240px;
+  --header-h: 60px;
+  --radius: 12px;
+  --font-mono: 'Space Mono', monospace;
+  --font: 'DM Sans', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font); background:var(--bg); color:var(--text); display:flex; height:100vh; overflow:hidden; }
+
+/* ── SIDEBAR ── */
+#sidebar {
+  width:var(--sidebar-w); height:100vh; background:var(--bg2);
+  border-right:1px solid var(--border); display:flex; flex-direction:column;
+  position:fixed; left:0; top:0; z-index:100; transition:transform .3s;
+}
+.sidebar-logo {
+  padding:20px 18px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px;
+}
+.sidebar-logo .logo-icon {
+  width:34px; height:34px; background:linear-gradient(135deg,var(--accent),#0066ff);
+  border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-size:16px; font-family:var(--font-mono); font-weight:700; color:#000;
+}
+.sidebar-logo .logo-text { font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--text); letter-spacing:1px; }
+.sidebar-logo .logo-sub { font-size:10px; color:var(--text3); font-family:var(--font-mono); }
+
+.nav-section { padding:12px 0 4px 18px; font-size:9px; font-family:var(--font-mono); color:var(--text3); letter-spacing:2px; text-transform:uppercase; }
+
+.nav-item {
+  display:flex; align-items:center; gap:10px; padding:10px 18px;
+  cursor:pointer; border-left:3px solid transparent; transition:all .2s;
+  font-size:13.5px; font-weight:500; color:var(--text2); position:relative;
+}
+.nav-item:hover { background:var(--bg3); color:var(--text); }
+.nav-item.active { background:rgba(0,212,255,.08); border-left-color:var(--accent); color:var(--accent); }
+.nav-item .nav-icon { font-size:16px; width:20px; text-align:center; }
+.nav-item .nav-badge { margin-left:auto; background:var(--accent); color:#000; font-size:9px; font-family:var(--font-mono); font-weight:700; padding:2px 6px; border-radius:20px; }
+.nav-item .nav-badge.warn { background:var(--accent2); }
+.nav-item .nav-badge.new { background:var(--accent3); }
+
+.sidebar-footer { margin-top:auto; padding:16px 18px; border-top:1px solid var(--border); }
+.store-tag { display:flex; align-items:center; gap:8px; }
+.store-dot { width:8px; height:8px; border-radius:50%; background:var(--accent3); box-shadow:0 0 8px var(--accent3); animation:pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+.store-name { font-size:12px; font-weight:600; color:var(--text); }
+.store-plan { font-size:10px; color:var(--text3); font-family:var(--font-mono); }
+
+/* ── MAIN ── */
+#main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+
+/* ── TOPBAR ── */
+#topbar {
+  height:var(--header-h); background:var(--bg2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 24px; gap:16px; flex-shrink:0;
+}
+.topbar-title { font-family:var(--font-mono); font-size:14px; font-weight:700; color:var(--text); flex:1; }
+.topbar-title span { color:var(--accent); }
+.topbar-search {
+  background:var(--bg3); border:1px solid var(--border); border-radius:8px;
+  padding:8px 14px; font-size:13px; color:var(--text); font-family:var(--font);
+  outline:none; width:220px; transition:border .2s;
+}
+.topbar-search:focus { border-color:var(--accent); }
+.topbar-search::placeholder { color:var(--text3); }
+.topbar-btn {
+  background:var(--bg3); border:1px solid var(--border); color:var(--text2);
+  padding:8px 12px; border-radius:8px; cursor:pointer; font-size:18px;
+  transition:all .2s; display:flex; align-items:center; gap:6px;
+}
+.topbar-btn:hover { border-color:var(--accent); color:var(--accent); }
+.topbar-publish {
+  background:linear-gradient(135deg,var(--accent),#0066ff); border:none;
+  color:#000; font-family:var(--font-mono); font-size:11px; font-weight:700;
+  padding:9px 16px; border-radius:8px; cursor:pointer; letter-spacing:.5px;
+  transition:opacity .2s;
+}
+.topbar-publish:hover { opacity:.85; }
+
+/* ── CONTENT ── */
+#content { flex:1; overflow-y:auto; padding:24px; }
+#content::-webkit-scrollbar { width:4px; }
+#content::-webkit-scrollbar-track { background:var(--bg); }
+#content::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+/* ── TABS ── */
+.tab-panel { display:none; animation:fadeUp .3s ease; }
+.tab-panel.active { display:block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:translateY(0);} }
+
+/* ── CARDS GRID ── */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
+.stat-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px; position:relative; overflow:hidden; cursor:default;
+  transition:border-color .2s, transform .2s;
+}
+.stat-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),transparent); }
+.stat-card.warn::before { background:linear-gradient(90deg,var(--accent2),transparent); }
+.stat-card.success::before { background:linear-gradient(90deg,var(--accent3),transparent); }
+.stat-card.danger::before { background:linear-gradient(90deg,var(--danger),transparent); }
+.stat-label { font-size:11px; font-family:var(--font-mono); color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+.stat-value { font-size:28px; font-weight:700; font-family:var(--font-mono); color:var(--text); }
+.stat-sub { font-size:11px; color:var(--text3); margin-top:4px; }
+.stat-icon { position:absolute; right:18px; top:18px; font-size:28px; opacity:.15; }
+
+/* ── SECTION HEADER ── */
+.section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.section-title { font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:1px; }
+.section-title .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:8px; }
+
+/* ── BUTTONS ── */
+.btn { padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all .2s; display:inline-flex; align-items:center; gap:6px; font-family:var(--font); }
+.btn-primary { background:var(--accent); color:#000; }
+.btn-primary:hover { opacity:.85; }
+.btn-outline { background:transparent; border:1px solid var(--border); color:var(--text2); }
+.btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+.btn-danger { background:rgba(255,71,87,.15); border:1px solid rgba(255,71,87,.3); color:var(--danger); }
+.btn-danger:hover { background:rgba(255,71,87,.25); }
+.btn-success { background:rgba(0,255,136,.15); border:1px solid rgba(0,255,136,.3); color:var(--accent3); }
+.btn-sm { padding:6px 12px; font-size:12px; }
+
+/* ── TABLE ── */
+.table-wrap { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+table { width:100%; border-collapse:collapse; }
+thead tr { background:var(--bg3); border-bottom:1px solid var(--border); }
+th { padding:12px 16px; font-size:11px; font-family:var(--font-mono); color:var(--text3); text-align:left; text-transform:uppercase; letter-spacing:1px; }
+td { padding:13px 16px; font-size:13px; color:var(--text2); border-bottom:1px solid var(--border); }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover td { background:rgba(255,255,255,.02); color:var(--text); }
+.td-mono { font-family:var(--font-mono); font-size:12px; }
+.badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; font-family:var(--font-mono); }
+.badge-green { background:rgba(0,255,136,.12); color:var(--accent3); }
+.badge-blue { background:rgba(0,212,255,.12); color:var(--accent); }
+.badge-amber { background:rgba(245,166,35,.12); color:var(--accent2); }
+.badge-red { background:rgba(255,71,87,.12); color:var(--danger); }
+.badge-gray { background:rgba(120,128,152,.12); color:var(--text2); }
+
+/* ── FORM ── */
+.form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group.full { grid-column:1/-1; }
+label { font-size:12px; font-family:var(--font-mono); color:var(--text3); text-transform:uppercase; letter-spacing:.5px; }
+input,select,textarea {
+  background:var(--bg3); border:1px solid var(--border); color:var(--text);
+  padding:10px 14px; border-radius:8px; font-size:13px; font-family:var(--font);
+  outline:none; transition:border .2s; width:100%;
+}
+input:focus,select:focus,textarea:focus { border-color:var(--accent); }
+select option { background:var(--bg3); }
+textarea { resize:vertical; min-height:80px; }
+
+/* ── CARD ── */
+.card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px; }
+.card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+.card-title { font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--text); }
+
+/* ── TOGGLE ── */
+.toggle { position:relative; width:44px; height:24px; cursor:pointer; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; inset:0; background:var(--bg3); border:1px solid var(--border); border-radius:24px; transition:.3s; }
+.toggle-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:var(--text3); border-radius:50%; transition:.3s; }
+.toggle input:checked + .toggle-slider { background:rgba(0,212,255,.2); border-color:var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform:translateX(20px); background:var(--accent); }
+
+/* ── PRODUCT GRID ── */
+.product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+.product-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+  overflow:hidden; transition:all .2s; cursor:default;
+}
+.product-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+.product-img { width:100%; height:130px; object-fit:cover; background:var(--bg3); display:flex; align-items:center; justify-content:center; font-size:40px; }
+.product-body { padding:14px; }
+.product-name { font-size:14px; font-weight:600; color:var(--text); margin-bottom:4px; }
+.product-cat { font-size:11px; color:var(--text3); font-family:var(--font-mono); }
+.product-price { font-size:18px; font-weight:700; font-family:var(--font-mono); color:var(--accent); margin:10px 0; }
+.product-actions { display:flex; gap:8px; }
+.product-stock { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text3); margin-bottom:8px; }
+
+/* ── KEY CARD ── */
+.key-card {
+  background:var(--bg3); border:1px solid var(--border); border-radius:10px;
+  padding:16px; display:flex; align-items:center; gap:14px; transition:border-color .2s;
+}
+.key-card:hover { border-color:var(--border); }
+.key-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#0066ff); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#000; flex-shrink:0; font-family:var(--font-mono); }
+.key-info { flex:1; }
+.key-name { font-size:14px; font-weight:600; color:var(--text); }
+.key-role { font-size:11px; color:var(--text3); font-family:var(--font-mono); }
+.key-code { font-size:11px; font-family:var(--font-mono); color:var(--accent); background:rgba(0,212,255,.08); padding:3px 8px; border-radius:4px; margin-top:4px; display:inline-block; }
+.key-perms { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+.key-perm { font-size:10px; font-family:var(--font-mono); color:var(--text3); background:var(--bg); padding:2px 8px; border-radius:4px; border:1px solid var(--border); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(4px);
+  z-index:200; display:none; align-items:center; justify-content:center; padding:20px;
+}
+.modal-overlay.open { display:flex; animation:fadeIn .2s; }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+.modal {
+  background:var(--bg2); border:1px solid var(--border); border-radius:16px;
+  padding:28px; width:100%; max-width:620px; max-height:90vh; overflow-y:auto;
+  animation:slideUp .3s;
+}
+@keyframes slideUp { from{transform:translateY(20px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+.modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+.modal-title { font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--text); }
+.modal-close { background:var(--bg3); border:1px solid var(--border); color:var(--text2); width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; }
+.modal-close:hover { color:var(--danger); border-color:var(--danger); }
+
+/* ── CHART FAKE ── */
+.chart-bar { display:flex; align-items:flex-end; gap:8px; height:120px; padding-top:10px; }
+.bar { flex:1; border-radius:4px 4px 0 0; background:linear-gradient(180deg,var(--accent) 0%,rgba(0,212,255,.3) 100%); position:relative; transition:height .5s; }
+.bar:hover { opacity:.8; }
+.bar-label { font-size:9px; font-family:var(--font-mono); color:var(--text3); text-align:center; margin-top:6px; }
+
+/* ── PROGRESS ── */
+.progress { background:var(--bg3); border-radius:4px; height:6px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--accent),#0066ff); transition:width .6s; }
+.progress-fill.warn { background:linear-gradient(90deg,var(--accent2),#ff8800); }
+.progress-fill.success { background:linear-gradient(90deg,var(--accent3),#00aa55); }
+
+/* ── TABS INLINE ── */
+.tabs-inline { display:flex; gap:0; background:var(--bg3); border-radius:8px; padding:4px; margin-bottom:20px; width:fit-content; }
+.tab-btn { padding:7px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; color:var(--text3); background:transparent; border:none; font-family:var(--font); transition:all .2s; }
+.tab-btn.active { background:var(--bg2); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.3); }
+
+/* ── GAMEZONE ── */
+.game-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px; display:flex; gap:16px; align-items:flex-start; transition:border-color .2s;
+}
+.game-card:hover { border-color:var(--accent); }
+.game-icon { font-size:36px; width:60px; height:60px; background:var(--bg3); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.game-info { flex:1; }
+.game-name { font-size:15px; font-weight:700; color:var(--text); margin-bottom:4px; font-family:var(--font-mono); }
+.game-desc { font-size:13px; color:var(--text2); margin-bottom:12px; }
+.game-meta { display:flex; gap:12px; flex-wrap:wrap; }
+.game-meta span { font-size:11px; font-family:var(--font-mono); color:var(--text3); background:var(--bg3); padding:3px 10px; border-radius:20px; }
+
+/* ── NOTIFY ── */
+#notify { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:8px; }
+.notify-item {
+  background:var(--bg2); border:1px solid var(--border); border-radius:10px;
+  padding:14px 18px; font-size:13px; color:var(--text); display:flex; align-items:center; gap:10px;
+  animation:slideLeft .3s; min-width:280px; box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
+@keyframes slideLeft { from{transform:translateX(40px);opacity:0;} to{transform:translateX(0);opacity:1;} }
+.notify-item.success { border-color:rgba(0,255,136,.3); }
+.notify-item.error { border-color:rgba(255,71,87,.3); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px) {
+  #sidebar { transform:translateX(-100%); }
+  #sidebar.open { transform:translateX(0); }
+  #main { margin-left:0; }
+  .stats-grid { grid-template-columns:1fr 1fr; }
+  .product-grid { grid-template-columns:1fr; }
+}
+
+/* ── SWITCH ROW ── */
+.switch-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border); }
+.switch-row:last-child { border-bottom:none; }
+.switch-info .switch-label { font-size:13px; font-weight:600; color:var(--text); }
+.switch-info .switch-desc { font-size:12px; color:var(--text3); margin-top:2px; }
+
+/* ── COLOR PICKER ROW ── */
+.color-row { display:flex; gap:12px; flex-wrap:wrap; }
+.color-swatch { width:36px; height:36px; border-radius:8px; cursor:pointer; border:3px solid transparent; transition:all .2s; }
+.color-swatch.active { border-color:var(--text); transform:scale(1.1); }
+
+/* ── ADS ── */
+.ad-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.social-btns { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; margin-top:16px; }
+.social-btn { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13px; font-weight:600; color:var(--text2); transition:all .2s; }
+.social-btn:hover { border-color:var(--accent); color:var(--text); }
+
+/* ── ANALYTICS ── */
+.analytics-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:600px) { .analytics-row { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">L</div>
+    <div>
+      <div class="logo-text">LABSYSTEM</div>
+      <div class="logo-sub">ERP · v2.0</div>
+    </div>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding:8px 0;">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="switchTab('dashboard',this)">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+
+    <div class="nav-section">Catálogo</div>
+    <div class="nav-item" onclick="switchTab('produtos',this)">
+      <span class="nav-icon">🍔</span> Produtos
+      <span class="nav-badge warn">3</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('pessoas',this)">
+      <span class="nav-icon">👤</span> Pessoas
+    </div>
+    <div class="nav-item" onclick="switchTab('pedidos',this)">
+      <span class="nav-icon">🛒</span> Pedidos
+      <span class="nav-badge">12</span>
+    </div>
+
+    <div class="nav-section">Engajamento</div>
+    <div class="nav-item" onclick="switchTab('cupons',this)">
+      <span class="nav-icon">🏷️</span> Cupons / LabGame
+      <span class="nav-badge new">NEW</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('gamezone',this)">
+      <span class="nav-icon">🎮</span> LabGame
+    </div>
+    <div class="nav-item" onclick="switchTab('ads',this)">
+      <span class="nav-icon">📢</span> LabAds
+    </div>
+
+    <div class="nav-section">Gestão</div>
+    <div class="nav-item" onclick="switchTab('financeiro',this)">
+      <span class="nav-icon">💰</span> Financeiro
+    </div>
+    <div class="nav-item" onclick="switchTab('estoque',this)">
+      <span class="nav-icon">📦</span> Estoque
+    </div>
+    <div class="nav-item" onclick="switchTab('agenda',this)">
+      <span class="nav-icon">📅</span> Agenda
+    </div>
+
+    <div class="nav-section">Sistema</div>
+    <div class="nav-item" onclick="switchTab('keys',this)">
+      <span class="nav-icon">🔑</span> Keys / Acessos
+    </div>
+    <div class="nav-item" onclick="switchTab('customizar',this)">
+      <span class="nav-icon">🎨</span> Customizar
+    </div>
+    <div class="nav-item" onclick="switchTab('config',this)">
+      <span class="nav-icon">⚙️</span> Configurações
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="store-tag">
+      <div class="store-dot"></div>
+      <div>
+        <div class="store-name" id="sidebar-store-name">McClone</div>
+        <div class="store-plan">Plano Pro · Publicado</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <button class="topbar-btn" onclick="toggleSidebar()" style="display:none;font-size:20px;" id="menu-btn">☰</button>
+    <div class="topbar-title"><span id="topbar-label">Dashboard</span></div>
+    <input class="topbar-search" type="text" placeholder="🔍  Buscar...">
+    <button class="topbar-btn" title="Notificações">🔔</button>
+    <button class="topbar-btn" title="Modo claro" onclick="alert('Em breve!')">🌙</button>
+    <button class="topbar-publish" onclick="publishData()">⚡ PUBLICAR</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="tab-panel active" id="tab-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card success">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">Total de Vendas</div>
+          <div class="stat-value" id="stat-vendas">R$ 0</div>
+          <div class="stat-sub">↑ +12% vs ontem</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🛒</div>
+          <div class="stat-label">Total de Pedidos</div>
+          <div class="stat-value" id="stat-pedidos">0</div>
+          <div class="stat-sub">Hoje · em tempo real</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-icon">🍔</div>
+          <div class="stat-label">Produto Mais Vendido</div>
+          <div class="stat-value" style="font-size:16px;" id="stat-produto">—</div>
+          <div class="stat-sub" id="stat-produto-qtd">0 unidades</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎮</div>
+          <div class="stat-label">Jogadas LabGame</div>
+          <div class="stat-value" id="stat-jogadas">0</div>
+          <div class="stat-sub" id="stat-brindes">0 brindes pendentes</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-icon">📦</div>
+          <div class="stat-label">Alerta de Estoque</div>
+          <div class="stat-value" id="stat-estoque">0</div>
+          <div class="stat-sub">Produtos em falta</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-label">Clientes Ativos</div>
+          <div class="stat-value" id="stat-clientes">0</div>
+          <div class="stat-sub">Últimos 30 dias</div>
+        </div>
+      </div>
+
+      <div class="analytics-row">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📈 Vendas — 7 dias</div>
+          </div>
+          <div class="chart-bar" id="chart-vendas"></div>
+          <div style="display:flex;gap:8px;" id="chart-labels"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔥 Top Produtos</div>
+          </div>
+          <div id="top-produtos"></div>
+        </div>
+      </div>
+
+      <div class="section-header" style="margin-top:24px;">
+        <div class="section-title"><span class="dot"></span>Pedidos Recentes</div>
+        <button class="btn btn-outline btn-sm" onclick="switchTab('pedidos',null)">Ver todos →</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>ID</th><th>Data</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Status</th>
+          </tr></thead>
+          <tbody id="recent-orders">
+            <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3);">Nenhum pedido ainda...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ PRODUTOS ═══ -->
+    <div class="tab-panel" id="tab-produtos">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>Gestão de Produtos</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="openModal('modal-categoria')">+ Categoria</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-produto')">+ Produto</button>
+        </div>
+      </div>
+
+      <div class="tabs-inline">
+        <button class="tab-btn active" onclick="switchProductView('grid',this)">⊞ Grid</button>
+        <button class="tab-btn" onclick="switchProductView('list',this)">≡ Lista</button>
+      </div>
+
+      <!-- Categorias -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="cat-filter">
+        <button class="btn btn-primary btn-sm" onclick="filterCat('all',this)">Todos</button>
+      </div>
+
+      <div class="product-grid" id="product-grid">
+        <!-- Produtos gerados por JS -->
+      </div>
+    </div>
+
+    <!-- ═══ PESSOAS ═══ -->
+    <div class="tab-panel" id="tab-pessoas">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>Gestão de Pessoas</div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-pessoa')">+ Cadastrar</button>
+      </div>
+
+      <div class="tabs-inline">
+        <button class="tab-btn active" onclick="switchPessoaView('clientes',this)">👤 Clientes</button>
+        <button class="tab-btn" onclick="switchPessoaView('funcionarios',this)">🧑‍💼 Funcionários</button>
+        <button class="tab-btn" onclick="switchPessoaView('fornecedores',this)">🏭 Fornecedores</button>
+        <button class="tab-btn" onclick="switchPessoaView('parceiros',this)">🤝 Parceiros</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nome</th><th>Contato</th><th>Tipo</th><th>Desde</th><th>Compras</th><th>Status</th><th></th></tr></thead>
+          <tbody id="pessoas-table">
+            <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text3);">Nenhum cadastro ainda...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ PEDIDOS ═══ -->
+    <div class="tab-panel" id="tab-pedidos">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>Central de Pedidos</div>
+        <div style="display:flex;gap:8px;">
+          <select style="width:auto;padding:8px 12px;" onchange="filterOrders(this.value)">
+            <option>Todos os status</option>
+            <option>Pendente</option>
+            <option>Preparando</option>
+            <option>Entregando</option>
+            <option>Concluído</option>
+            <option>Cancelado</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Data</th><th>Cliente</th><th>Itens</th><th>Entrega</th><th>Total</th><th>Status</th><th></th></tr></thead>
+          <tbody id="orders-table">
+            <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text3);">Nenhum pedido encontrado.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ CUPONS / LABGAME ═══ -->
+    <div class="tab-panel" id="tab-cupons">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>Cupons & Fidelidade</div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-cupom')">+ Criar Cupom</button>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card">
+          <div class="stat-label">Total Criados</div>
+          <div class="stat-value">0</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-label">Ativos</div>
+          <div class="stat-value">0</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-label">Resgatados</div>
+          <div class="stat-value">0</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-label">Expirados</div>
+          <div class="stat-value">0</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🏷️ Cupons Ativos</div></div>
+        <div class="table-wrap" style="border:none;border-radius:0;">
+          <table>
+            <thead><tr><th>Código</th><th>Tipo</th><th>Valor</th><th>Validade</th><th>Usos</th><th>Limite</th><th>Status</th><th></th></tr></thead>
+            <tbody id="cupons-table">
+              <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text3);">Nenhum cupom criado.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><div class="card-title">⭐ Programa de Fidelidade</div></div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Pontos por R$1 gasto</label>
+            <input type="number" value="1" min="1">
+          </div>
+          <div class="form-group">
+            <label>Resgate mínimo (pontos)</label>
+            <input type="number" value="100">
+          </div>
+          <div class="form-group">
+            <label>Validade dos pontos (dias)</label>
+            <input type="number" value="365">
+          </div>
+          <div class="form-group">
+            <label>Cashback %</label>
+            <input type="number" value="5" min="0" max="100">
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px;">Salvar Programa</button>
+      </div>
+    </div>
+
+    <!-- ═══ LABGAME ═══ -->
+    <div class="tab-panel" id="tab-gamezone">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>LabGame — Central de Jogos</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;" id="games-list">
+
+        <!-- MimoGame -->
+        <div class="game-card">
+          <div class="game-icon">🧠</div>
+          <div class="game-info">
+            <div class="game-name">MimoGame — Jogo da Memória</div>
+            <div class="game-desc">Clientes jogam e ganham brindes ao completar o jogo. Configure frequência, prêmio e validade.</div>
+            <div class="game-meta">
+              <span id="mimo-freq-label">1 a cada 100 jogadas</span>
+              <span id="mimo-brinde-label">Brinde: —</span>
+              <span id="mimo-validade-label">Validade: —</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+            <label class="toggle"><input type="checkbox" id="mimo-ativo" onchange="saveGameConfig()"><span class="toggle-slider"></span></label>
+            <button class="btn btn-outline btn-sm" onclick="openModal('modal-mimogame')">⚙️ Config</button>
+            <span class="badge badge-green" id="mimo-status-badge">Ativo</span>
+          </div>
+        </div>
+
+        <!-- LABRIGame Slots -->
+        <div class="game-card">
+          <div class="game-icon">🎰</div>
+          <div class="game-info">
+            <div class="game-name">LabGame Slots — Caça-Níqueis Digital</div>
+            <div class="game-desc">Sistema de créditos com slots temáticos. Clientes compram créditos ou ganham jogando.</div>
+            <div class="game-meta">
+              <span id="slots-creditos-label">10 créditos iniciais</span>
+              <span id="slots-razao-label">10 créditos / R$1</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+            <label class="toggle"><input type="checkbox" id="slots-ativo" onchange="saveGameConfig()"><span class="toggle-slider"></span></label>
+            <button class="btn btn-outline btn-sm" onclick="openModal('modal-slots')">⚙️ Config</button>
+            <span class="badge badge-gray" id="slots-status-badge">Inativo</span>
+          </div>
+        </div>
+
+        <!-- Em breve -->
+        <div class="game-card" style="opacity:.5;">
+          <div class="game-icon">🎲</div>
+          <div class="game-info">
+            <div class="game-name">LabGame Roleta — Em Breve</div>
+            <div class="game-desc">Roleta digital com premiação configurável. Disponível na Fase 3.</div>
+          </div>
+          <span class="badge badge-amber">Em breve</span>
+        </div>
+
+        <div class="game-card" style="opacity:.5;">
+          <div class="game-icon">🎟️</div>
+          <div class="game-info">
+            <div class="game-name">Raspadinha Digital — Em Breve</div>
+            <div class="game-desc">Raspadinha virtual com prêmios e integração com cupons.</div>
+          </div>
+          <span class="badge badge-amber">Em breve</span>
+        </div>
+
+      </div>
+
+      <!-- Stats dos jogos -->
+      <div class="card" style="margin-top:24px;">
+        <div class="card-header"><div class="card-title">📊 Estatísticas dos Jogos</div></div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:0;">
+          <div class="stat-card"><div class="stat-label">Total Jogadas</div><div class="stat-value" id="g-total">0</div></div>
+          <div class="stat-card warn"><div class="stat-label">Brindes Pendentes</div><div class="stat-value" id="g-pendentes">0</div></div>
+          <div class="stat-card success"><div class="stat-label">Resgatados</div><div class="stat-value" id="g-resgatados">0</div></div>
+          <div class="stat-card danger"><div class="stat-label">Expirados</div><div class="stat-value" id="g-expirados">0</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LABADS ═══ -->
+    <div class="tab-panel" id="tab-ads">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>LabAds — Publicidade</div>
+        <button class="btn btn-primary btn-sm">+ Nova Campanha</button>
+      </div>
+
+      <div class="ad-card" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">📱 Redes Sociais</div>
+        <div style="font-size:13px;color:var(--text3);">Conecte suas redes para publicar cardápio, promoções e campanhas automaticamente.</div>
+        <div class="social-btns">
+          <div class="social-btn">📸 Instagram</div>
+          <div class="social-btn">👍 Facebook</div>
+          <div class="social-btn">🎵 TikTok</div>
+          <div class="social-btn">💬 WhatsApp</div>
+          <div class="social-btn">▶️ YouTube</div>
+          <div class="social-btn" style="opacity:.5;">🔍 Google Ads</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📣 Campanhas Ativas</div></div>
+        <div style="padding:24px;text-align:center;color:var(--text3);">Nenhuma campanha ativa. Crie sua primeira campanha.</div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><div class="card-title">🖼️ Banners Internos (Totem)</div></div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>URL do Banner</label>
+            <input type="url" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>Link de destino</label>
+            <input type="url" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>Validade</label>
+            <input type="date">
+          </div>
+          <div class="form-group">
+            <label>Posição</label>
+            <select><option>Topo do cardápio</option><option>Entre categorias</option><option>Rodapé</option></select>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px;">Salvar Banner</button>
+      </div>
+    </div>
+
+    <!-- ═══ FINANCEIRO ═══ -->
+    <div class="tab-panel" id="tab-financeiro">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>Financeiro</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card success"><div class="stat-label">Receita Total</div><div class="stat-value">R$ 0</div><div class="stat-sub">Este mês</div></div>
+        <div class="stat-card warn"><div class="stat-label">A Receber</div><div class="stat-value">R$ 0</div></div>
+        <div class="stat-card danger"><div class="stat-label">A Pagar</div><div class="stat-value">R$ 0</div></div>
+        <div class="stat-card"><div class="stat-label">Lucro Líquido</div><div class="stat-value">R$ 0</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">💳 Meios de Pagamento</div></div>
+        <div id="payment-switches">
+          <div class="switch-row"><div class="switch-info"><div class="switch-label">💵 Dinheiro</div><div class="switch-desc">Pagamento em espécie</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="switch-row"><div class="switch-info"><div class="switch-label">⚡ Pix</div><div class="switch-desc">Pagamento instantâneo</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="switch-row"><div class="switch-info"><div class="switch-label">💳 Crédito</div><div class="switch-desc">Cartão de crédito</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="switch-row"><div class="switch-info"><div class="switch-label">💳 Débito</div><div class="switch-desc">Cartão de débito</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="switch-row"><div class="switch-info"><div class="switch-label">📄 Boleto</div><div class="switch-desc">Pagamento em boleto</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ESTOQUE ═══ -->
+    <div class="tab-panel" id="tab-estoque">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>Controle de Estoque</div>
+        <button class="btn btn-primary btn-sm">+ Entrada</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📦 Produtos em Estoque</div></div>
+        <div class="table-wrap" style="border:none;border-radius:0;">
+          <table>
+            <thead><tr><th>Produto</th><th>SKU</th><th>Qtd</th><th>Mínimo</th><th>Validade</th><th>Status</th></tr></thead>
+            <tbody id="estoque-table">
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3);">Nenhum item no estoque.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ AGENDA ═══ -->
+    <div class="tab-panel" id="tab-agenda">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>Agenda de Serviços</div>
+        <button class="btn btn-primary btn-sm">+ Agendamento</button>
+      </div>
+      <div class="card" style="text-align:center;padding:60px;">
+        <div style="font-size:48px;margin-bottom:16px;">📅</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px;">Módulo de Agenda</div>
+        <div style="font-size:13px;color:var(--text3);">Disponível para clínicas, salões, academias e serviços com agendamento.</div>
+        <button class="btn btn-primary" style="margin-top:20px;">Ativar Módulo de Agenda</button>
+      </div>
+    </div>
+
+    <!-- ═══ KEYS ═══ -->
+    <div class="tab-panel" id="tab-keys">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>Keys & Acessos</div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-key')">+ Criar Key</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;" id="keys-list">
+        <div class="card" style="text-align:center;padding:40px;">
+          <div style="font-size:36px;margin-bottom:12px;">🔑</div>
+          <div style="font-size:14px;color:var(--text3);">Nenhuma key criada. Crie acessos para sua equipe.</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><div class="card-title">📋 Permissões por Perfil</div></div>
+        <div class="table-wrap" style="border:none;border-radius:0;">
+          <table>
+            <thead><tr><th>Permissão</th><th>Admin</th><th>Gerente</th><th>Operador</th></tr></thead>
+            <tbody>
+              <tr><td>Ver Pedidos</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td></tr>
+              <tr><td>Editar Cardápio</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-red">✗</span></td></tr>
+              <tr><td>Resgatar Brindes</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td></tr>
+              <tr><td>Ver Financeiro</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-red">✗</span></td></tr>
+              <tr><td>Criar Keys</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-red">✗</span></td><td><span class="badge badge-red">✗</span></td></tr>
+              <tr><td>Publicar Dados</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-amber">Config</span></td><td><span class="badge badge-red">✗</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CUSTOMIZAR ═══ -->
+    <div class="tab-panel" id="tab-customizar">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>Customização Visual</div>
+        <button class="btn btn-primary btn-sm" onclick="saveCustomization()">💾 Salvar</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🏪 Identidade</div></div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Nome da Loja</label>
+            <input type="text" id="c-nome" placeholder="Ex: McClone Venda Rápida">
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Slogan</label>
+            <input type="text" id="c-slogan" placeholder="Ex: Sabor rápido, preço certo!">
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>URL do Logo</label>
+            <input type="url" id="c-logo" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>URL da Imagem de Fundo</label>
+            <input type="url" id="c-fundo" placeholder="https://...">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">🎨 Cores</div></div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Cor Primária</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="color" id="c-cor1" value="#00d4ff" style="width:50px;height:40px;padding:2px;cursor:pointer;">
+              <input type="text" id="c-cor1-hex" value="#00d4ff" style="flex:1;">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Cor Secundária</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="color" id="c-cor2" value="#f5a623" style="width:50px;height:40px;padding:2px;cursor:pointer;">
+              <input type="text" id="c-cor2-hex" value="#f5a623" style="flex:1;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Presets</label>
+            <div class="color-row">
+              <div class="color-swatch" style="background:#DA291C;" onclick="applyPreset('#DA291C','#FFCC00')" title="McClone"></div>
+              <div class="color-swatch" style="background:#10B981;" onclick="applyPreset('#10B981','#059669')" title="Verde"></div>
+              <div class="color-swatch" style="background:#6366f1;" onclick="applyPreset('#6366f1','#8b5cf6')" title="Roxo"></div>
+              <div class="color-swatch" style="background:#f59e0b;" onclick="applyPreset('#f59e0b','#ef4444')" title="Âmbar"></div>
+              <div class="color-swatch" style="background:#0ea5e9;" onclick="applyPreset('#0ea5e9','#06b6d4')" title="Azul"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><div class="card-title">🎵 Música Ambiente</div></div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>URL do YouTube</label>
+            <input type="url" id="c-musica" placeholder="https://youtube.com/watch?v=...">
+          </div>
+          <div class="form-group">
+            <label>Volume (0-100)</label>
+            <input type="range" id="c-volume" min="0" max="100" value="30" style="padding:0;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CONFIG ═══ -->
+    <div class="tab-panel" id="tab-config">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span>Configurações Gerais</div>
+      </div>
+
+      <div class="form-grid">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🏪 Dados Operacionais</div></div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>WhatsApp (com DDD)</label>
+            <input type="tel" id="cfg-whatsapp" placeholder="5511999999999">
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Status da Loja</label>
+            <select id="cfg-status">
+              <option value="aberta">✅ Aberta</option>
+              <option value="fechada">❌ Fechada</option>
+              <option value="pausada">⏸ Pausada</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Segmento do Negócio</label>
+            <select id="cfg-segmento">
+              <option>🍔 Hamburgueria</option>
+              <option>🍕 Pizzaria</option>
+              <option>🥤 Lanchonete</option>
+              <option>🍽️ Restaurante</option>
+              <option>☕ Cafeteria</option>
+              <option>🦷 Clínica Odontológica</option>
+              <option>🐾 Pet Shop</option>
+              <option>💅 Salão de Beleza</option>
+              <option>🏋️ Academia</option>
+              <option>⚖️ Advocacia</option>
+              <option>🛒 Varejo</option>
+              <option>⚙️ Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">🛵 Entrega</div></div>
+          <div id="areas-list" style="margin-bottom:12px;">
+            <div style="font-size:12px;color:var(--text3);padding:12px 0;">Nenhuma área cadastrada.</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="openModal('modal-area')">+ Adicionar Área</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><div class="card-title">🌐 API & Integração</div></div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>API URL (Cloudflare)</label>
+            <input type="text" id="cfg-api" value="https://labsystem-api.lab-wokerlabcore.workers.dev">
+          </div>
+          <div class="form-group">
+            <label>Store ID</label>
+            <input type="text" id="cfg-store-id" placeholder="ex: mcclone-001">
+          </div>
+          <div class="form-group">
+            <label>Master Key (senha)</label>
+            <input type="password" id="cfg-master-key" placeholder="••••••••">
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <label>&nbsp;</label>
+            <button class="btn btn-success" onclick="testConnection()">🔌 Testar Conexão</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><div class="card-title">🔔 Notificações</div></div>
+        <div class="switch-row"><div class="switch-info"><div class="switch-label">WhatsApp para novo pedido</div><div class="switch-desc">Receba alerta no WhatsApp a cada pedido</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+        <div class="switch-row"><div class="switch-info"><div class="switch-label">Alerta de estoque baixo</div><div class="switch-desc">Notificar quando produto atingir mínimo</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+        <div class="switch-row"><div class="switch-info"><div class="switch-label">Relatório diário</div><div class="switch-desc">Resumo de vendas todo dia às 23h</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+      </div>
+
+      <button class="btn btn-primary" style="margin-top:16px;" onclick="saveConfig()">💾 Salvar Configurações</button>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Modal Produto -->
+<div class="modal-overlay" id="modal-produto">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">+ Novo Produto / Serviço</div>
+      <button class="modal-close" onclick="closeModal('modal-produto')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Nome do Produto</label>
+        <input type="text" id="p-nome" placeholder="Ex: McClone Classic">
+      </div>
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="p-cat"><option>🍔 Hambúrgueres</option><option>🍟 Porções</option><option>🥤 Bebidas</option></select>
+      </div>
+      <div class="form-group">
+        <label>SKU / Código</label>
+        <input type="text" id="p-sku" placeholder="Ex: BRG-001">
+      </div>
+      <div class="form-group">
+        <label>Preço (R$)</label>
+        <input type="number" id="p-preco" step="0.01" placeholder="0,00">
+      </div>
+      <div class="form-group">
+        <label>Unidade de Medida</label>
+        <select id="p-unidade">
+          <option>Unidade</option><option>Kg</option><option>g</option><option>L</option><option>ml</option><option>Hora</option><option>Sessão</option><option>Pacote</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Estoque Inicial</label>
+        <input type="number" id="p-estoque" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Alerta de Estoque Mínimo</label>
+        <input type="number" id="p-alerta" placeholder="10">
+      </div>
+      <div class="form-group full">
+        <label>Descrição</label>
+        <textarea id="p-desc" placeholder="Descreva o produto..."></textarea>
+      </div>
+      <div class="form-group full">
+        <label>URL da Imagem</label>
+        <input type="url" id="p-img" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>Em Destaque</label>
+        <label class="toggle"><input type="checkbox" id="p-destaque"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="form-group">
+        <label>Ativo no Cardápio</label>
+        <label class="toggle"><input type="checkbox" id="p-ativo" checked><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('modal-produto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addProduct()">Salvar Produto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal MimoGame Config -->
+<div class="modal-overlay" id="modal-mimogame">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ Config — MimoGame</div>
+      <button class="modal-close" onclick="closeModal('modal-mimogame')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Frequência de Ganho</label>
+        <input type="number" id="m-freq" value="100" min="1" placeholder="Ex: 100 = 1 a cada 100 jogadas">
+      </div>
+      <div class="form-group">
+        <label>Tempo do Jogo (segundos)</label>
+        <input type="number" id="m-tempo" value="60" min="10">
+      </div>
+      <div class="form-group full">
+        <label>Texto do Brinde</label>
+        <input type="text" id="m-brinde" placeholder="Ex: Refrigerante grátis na próxima compra!">
+      </div>
+      <div class="form-group">
+        <label>Valor do Brinde (R$)</label>
+        <input type="number" id="m-valor" step="0.01" placeholder="0,00">
+      </div>
+      <div class="form-group">
+        <label>Validade do Brinde</label>
+        <input type="date" id="m-validade">
+      </div>
+      <div class="form-group">
+        <label>Quantidade Disponível</label>
+        <input type="number" id="m-qtd" placeholder="Ex: 100">
+      </div>
+      <div class="form-group">
+        <label>Exibição no Totem</label>
+        <select id="m-exibicao">
+          <option value="banner">Banner no topo</option>
+          <option value="botao">Botão fixo</option>
+          <option value="pos-pedido">Após finalizar pedido</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('modal-mimogame')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMimoConfig()">Salvar Config</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Slots Config -->
+<div class="modal-overlay" id="modal-slots">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ Config — LabGame Slots</div>
+      <button class="modal-close" onclick="closeModal('modal-slots')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Créditos Iniciais</label>
+        <input type="number" id="s-creditos" value="10">
+      </div>
+      <div class="form-group">
+        <label>Créditos por R$1</label>
+        <input type="number" id="s-razao" value="10">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('modal-slots')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSlotsConfig()">Salvar Config</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Key -->
+<div class="modal-overlay" id="modal-key">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🔑 Nova Key de Acesso</div>
+      <button class="modal-close" onclick="closeModal('modal-key')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Nome do Funcionário</label>
+        <input type="text" id="k-nome" placeholder="Ex: João Operador">
+      </div>
+      <div class="form-group">
+        <label>Perfil de Acesso</label>
+        <select id="k-perfil">
+          <option value="admin">Admin</option>
+          <option value="gerente">Gerente</option>
+          <option value="operador" selected>Operador</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Validade</label>
+        <input type="date" id="k-validade">
+      </div>
+    </div>
+    <div style="margin-top:16px;">
+      <label style="display:block;margin-bottom:8px;">Permissões Extras</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <label style="display:flex;align-items:center;gap:6px;font-family:var(--font);text-transform:none;letter-spacing:0;font-size:13px;"><input type="checkbox"> Ver pedidos</label>
+        <label style="display:flex;align-items:center;gap:6px;font-family:var(--font);text-transform:none;letter-spacing:0;font-size:13px;"><input type="checkbox"> Resgatar brindes</label>
+        <label style="display:flex;align-items:center;gap:6px;font-family:var(--font);text-transform:none;letter-spacing:0;font-size:13px;"><input type="checkbox"> Ver financeiro</label>
+        <label style="display:flex;align-items:center;gap:6px;font-family:var(--font);text-transform:none;letter-spacing:0;font-size:13px;"><input type="checkbox"> Editar cardápio</label>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('modal-key')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createKey()">Gerar Key</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cupom -->
+<div class="modal-overlay" id="modal-cupom">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🏷️ Novo Cupom</div>
+      <button class="modal-close" onclick="closeModal('modal-cupom')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Código do Cupom</label>
+        <input type="text" id="cup-codigo" placeholder="Ex: PROMO10">
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="cup-tipo">
+          <option value="percent">Percentual (%)</option>
+          <option value="fixo">Valor Fixo (R$)</option>
+          <option value="frete">Frete Grátis</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Valor do Desconto</label>
+        <input type="number" id="cup-valor" placeholder="10">
+      </div>
+      <div class="form-group">
+        <label>Limite de Usos</label>
+        <input type="number" id="cup-limite" placeholder="100">
+      </div>
+      <div class="form-group">
+        <label>Validade</label>
+        <input type="date" id="cup-validade">
+      </div>
+      <div class="form-group">
+        <label>Pedido Mínimo (R$)</label>
+        <input type="number" id="cup-minimo" placeholder="0,00" step="0.01">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('modal-cupom')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createCupom()">Criar Cupom</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notificações -->
+<div id="notify"></div>
+
+<script>
+// ── CONFIG ──
+const API_URL = 'https://labsystem-api.lab-wokerlabcore.workers.dev';
+let storeData = {};
+let products = [];
+let keys = [];
+let orders = [];
+let cupons = [];
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  loadFromStorage();
+  renderDashboard();
+  renderProducts();
+  renderChart();
+  renderTopProducts();
+  checkMobile();
+});
+
+function checkMobile() {
+  if (window.innerWidth <= 768) {
+    document.getElementById('menu-btn').style.display = 'flex';
+  }
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ── LOCAL STORAGE ──
+function loadFromStorage() {
+  const saved = localStorage.getItem('labsystem_data');
+  if (saved) {
+    const d = JSON.parse(saved);
+    storeData = d.store || {};
+    products = d.products || getSampleProducts();
+    keys = d.keys || [];
+    orders = d.orders || getSampleOrders();
+    cupons = d.cupons || [];
+  } else {
+    products = getSampleProducts();
+    orders = getSampleOrders();
+  }
+  // Preencher campos config
+  if (storeData.nome) document.getElementById('c-nome').value = storeData.nome;
+  if (storeData.slogan) document.getElementById('c-slogan').value = storeData.slogan;
+  if (storeData.whatsapp) document.getElementById('cfg-whatsapp').value = storeData.whatsapp;
+  document.getElementById('sidebar-store-name').textContent = storeData.nome || 'Minha Loja';
+}
+
+function saveToStorage() {
+  localStorage.setItem('labsystem_data', JSON.stringify({ store: storeData, products, keys, orders, cupons }));
+}
+
+// ── TABS ──
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('topbar-label').textContent = el?.querySelector('span:not(.nav-icon):not(.nav-badge)')?.textContent?.trim() || tab;
+  if (tab === 'gamezone') loadGameStats();
+  if (tab === 'keys') renderKeys();
+  if (tab === 'cupons') renderCupons();
+}
+
+function switchProductView(view, el) {
+  document.querySelectorAll('.tabs-inline .tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const grid = document.getElementById('product-grid');
+  grid.style.gridTemplateColumns = view === 'list' ? '1fr' : 'repeat(auto-fill,minmax(220px,1fr))';
+}
+
+function switchPessoaView(view, el) {
+  document.querySelectorAll('#tab-pessoas .tabs-inline .tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── MODALS ──
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('open');
+  }
+});
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const total = orders.reduce((s, o) => s + (o.total || 0), 0);
+  document.getElementById('stat-vendas').textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+  document.getElementById('stat-pedidos').textContent = orders.length;
+
+  const topProd = getTopProduct();
+  document.getElementById('stat-produto').textContent = topProd.nome;
+  document.getElementById('stat-produto-qtd').textContent = topProd.qtd + ' unidades';
+
+  const baixo = products.filter(p => p.estoque <= p.alerta).length;
+  document.getElementById('stat-estoque').textContent = baixo;
+
+  renderRecentOrders();
+}
+
+function getTopProduct() {
+  if (!products.length) return { nome: '—', qtd: 0 };
+  return products.reduce((a, b) => ((b.vendas || 0) > (a.vendas || 0) ? b : a), products[0]);
+}
+
+function renderRecentOrders() {
+  const tbody = document.getElementById('recent-orders');
+  if (!orders.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3);">Nenhum pedido ainda...</td></tr>'; return; }
+  tbody.innerHTML = orders.slice(0, 8).map(o => `
+    <tr>
+      <td class="td-mono">#${o.id}</td>
+      <td>${o.data}</td>
+      <td>${o.cliente}</td>
+      <td>${o.itens}</td>
+      <td class="td-mono" style="color:var(--accent3);">R$ ${(o.total||0).toFixed(2).replace('.',',')}</td>
+      <td><span class="badge ${badgeClass(o.status)}">${o.status}</span></td>
+    </tr>`).join('');
+}
+
+function badgeClass(s) {
+  return { 'Concluído':'badge-green', 'Preparando':'badge-blue', 'Pendente':'badge-amber', 'Cancelado':'badge-red', 'Entregando':'badge-blue' }[s] || 'badge-gray';
+}
+
+// ── CHART ──
+function renderChart() {
+  const dias = ['Seg','Ter','Qua','Qui','Sex','Sab','Dom'];
+  const vals = dias.map(() => Math.floor(Math.random() * 80) + 20);
+  const max = Math.max(...vals);
+  const chart = document.getElementById('chart-vendas');
+  const labels = document.getElementById('chart-labels');
+  chart.innerHTML = vals.map((v, i) => `<div class="bar" style="height:${(v/max)*100}%" title="${dias[i]}: R$${v}0"></div>`).join('');
+  labels.innerHTML = dias.map(d => `<div class="bar-label" style="flex:1;">${d}</div>`).join('');
+}
+
+function renderTopProducts() {
+  const el = document.getElementById('top-produtos');
+  const sorted = [...products].sort((a, b) => (b.vendas||0) - (a.vendas||0)).slice(0, 5);
+  const max = sorted[0]?.vendas || 1;
+  el.innerHTML = sorted.map(p => `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+        <span style="color:var(--text);font-weight:500;">${p.nome}</span>
+        <span class="td-mono" style="color:var(--accent3);">${p.vendas||0}x</span>
+      </div>
+      <div class="progress"><div class="progress-fill" style="width:${((p.vendas||0)/max)*100}%"></div></div>
+    </div>`).join('') || '<div style="color:var(--text3);padding:12px;">Sem dados ainda.</div>';
+}
+
+// ── PRODUCTS ──
+function getSampleProducts() {
+  return [
+    { id:'p1', nome:'McClone Classic', cat:'🍔 Hambúrgueres', preco:18.90, estoque:45, alerta:10, vendas:38, img:'🍔', ativo:true, destaque:true },
+    { id:'p2', nome:'McClone Duplo', cat:'🍔 Hambúrgueres', preco:26.90, estoque:30, alerta:10, vendas:22, img:'🍔', ativo:true },
+    { id:'p3', nome:'Batata Frita M', cat:'🍟 Porções', preco:12.90, estoque:8, alerta:10, vendas:41, img:'🍟', ativo:true },
+    { id:'p4', nome:'Coca-Cola 350ml', cat:'🥤 Bebidas', preco:6.90, estoque:60, alerta:15, vendas:55, img:'🥤', ativo:true },
+    { id:'p5', nome:'Milk Shake Chocolate', cat:'🥤 Bebidas', preco:16.90, estoque:2, alerta:5, vendas:18, img:'🧋', ativo:true },
+  ];
+}
+
+function renderProducts() {
+  const grid = document.getElementById('product-grid');
+  // Build category filters
+  const cats = [...new Set(products.map(p => p.cat))];
+  const filterEl = document.getElementById('cat-filter');
+  filterEl.innerHTML = '<button class="btn btn-primary btn-sm" onclick="filterCat(\'all\',this)">Todos</button>' +
+    cats.map(c => `<button class="btn btn-outline btn-sm" onclick="filterCat('${c}',this)">${c}</button>`).join('');
+
+  grid.innerHTML = products.map(p => `
+    <div class="product-card" id="pc-${p.id}">
+      <div class="product-img" style="${p.img && p.img.startsWith('http') ? `background-image:url(${p.img});background-size:cover;font-size:0;` : 'font-size:40px;'}">${p.img && !p.img.startsWith('http') ? p.img : ''}</div>
+      <div class="product-body">
+        ${p.destaque ? '<span class="badge badge-amber" style="margin-bottom:6px;">⭐ Destaque</span>' : ''}
+        <div class="product-name">${p.nome}</div>
+        <div class="product-cat">${p.cat}</div>
+        <div class="product-stock">
+          <span style="color:${p.estoque <= p.alerta ? 'var(--danger)' : 'var(--accent3)'};">●</span>
+          Estoque: ${p.estoque} un.
+          ${p.estoque <= p.alerta ? '<span class="badge badge-red" style="font-size:9px;">⚠ Baixo</span>' : ''}
+        </div>
+        <div class="product-price">R$ ${p.preco.toFixed(2).replace('.',',')}</div>
+        <div class="product-actions">
+          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="editProduct('${p.id}')">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterCat(cat, el) {
+  document.querySelectorAll('#cat-filter .btn').forEach(b => { b.className = 'btn btn-outline btn-sm'; });
+  el.className = 'btn btn-primary btn-sm';
+  document.querySelectorAll('.product-card').forEach(c => {
+    c.style.display = 'block';
+    if (cat !== 'all' && !c.id) return;
+  });
+  if (cat === 'all') { document.querySelectorAll('.product-card').forEach(c => c.style.display = 'block'); return; }
+  products.forEach(p => {
+    const el2 = document.getElementById('pc-' + p.id);
+    if (el2) el2.style.display = p.cat === cat ? 'block' : 'none';
+  });
+}
+
+function addProduct() {
+  const p = {
+    id: 'p' + Date.now(),
+    nome: document.getElementById('p-nome').value,
+    cat: document.getElementById('p-cat').value,
+    preco: parseFloat(document.getElementById('p-preco').value) || 0,
+    estoque: parseInt(document.getElementById('p-estoque').value) || 0,
+    alerta: parseInt(document.getElementById('p-alerta').value) || 10,
+    img: document.getElementById('p-img').value || '📦',
+    descricao: document.getElementById('p-desc').value,
+    ativo: document.getElementById('p-ativo').checked,
+    destaque: document.getElementById('p-destaque').checked,
+    vendas: 0,
+  };
+  if (!p.nome) { notify('Digite o nome do produto.', 'error'); return; }
+  products.push(p);
+  saveToStorage();
+  renderProducts();
+  closeModal('modal-produto');
+  notify('✅ Produto "' + p.nome + '" adicionado!', 'success');
+}
+
+function deleteProduct(id) {
+  if (!confirm('Remover produto?')) return;
+  products = products.filter(p => p.id !== id);
+  saveToStorage();
+  renderProducts();
+  notify('🗑️ Produto removido.', 'success');
+}
+
+function editProduct(id) {
+  notify('Edição completa em breve! Use exclusão e recrie.', 'success');
+}
+
+// ── SAMPLE ORDERS ──
+function getSampleOrders() {
+  return [
+    { id:1770668382595, data:'19/02/2026', cliente:'João', itens:'2 itens', total:37.80, status:'Concluído' },
+    { id:1770668382596, data:'19/02/2026', cliente:'Maria', itens:'1 item', total:18.90, status:'Preparando' },
+    { id:1770668382597, data:'19/02/2026', cliente:'Carlos', itens:'3 itens', total:52.70, status:'Pendente' },
+  ];
+}
+
+// ── KEYS ──
+function createKey() {
+  const nome = document.getElementById('k-nome').value;
+  if (!nome) { notify('Digite o nome do funcionário.', 'error'); return; }
+  const key = {
+    id: 'func-' + Date.now(),
+    nome,
+    perfil: document.getElementById('k-perfil').value,
+    key: 'KEY-' + Math.random().toString(36).substr(2,4).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase(),
+    validade: document.getElementById('k-validade').value,
+    ativo: true,
+    criadoEm: new Date().toLocaleDateString('pt-BR'),
+  };
+  keys.push(key);
+  saveToStorage();
+  renderKeys();
+  closeModal('modal-key');
+  notify('🔑 Key criada para ' + nome + ': ' + key.key, 'success');
+}
+
+function renderKeys() {
+  const el = document.getElementById('keys-list');
+  if (!keys.length) {
+    el.innerHTML = '<div class="card" style="text-align:center;padding:40px;"><div style="font-size:36px;margin-bottom:12px;">🔑</div><div style="font-size:14px;color:var(--text3);">Nenhuma key criada.</div></div>';
+    return;
+  }
+  const perfis = { admin:'🔴 Admin', gerente:'🟡 Gerente', operador:'🟢 Operador' };
+  el.innerHTML = keys.map(k => `
+    <div class="key-card">
+      <div class="key-avatar">${k.nome[0]}</div>
+      <div class="key-info">
+        <div class="key-name">${k.nome}</div>
+        <div class="key-role">${perfis[k.perfil] || k.perfil}</div>
+        <div class="key-code">${k.key}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;">Criado: ${k.criadoEm} ${k.validade ? '· Válido até: ' + k.validade : ''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+        <span class="badge ${k.ativo ? 'badge-green' : 'badge-red'}">${k.ativo ? 'Ativo' : 'Inativo'}</span>
+        <button class="btn btn-danger btn-sm" onclick="revokeKey('${k.id}')">Revogar</button>
+      </div>
+    </div>`).join('');
+}
+
+function revokeKey(id) {
+  keys = keys.filter(k => k.id !== id);
+  saveToStorage();
+  renderKeys();
+  notify('🔑 Key revogada.', 'success');
+}
+
+// ── CUPONS ──
+function createCupom() {
+  const codigo = document.getElementById('cup-codigo').value.toUpperCase();
+  if (!codigo) { notify('Digite o código do cupom.', 'error'); return; }
+  const c = {
+    id: 'cup-' + Date.now(),
+    codigo,
+    tipo: document.getElementById('cup-tipo').value,
+    valor: parseFloat(document.getElementById('cup-valor').value) || 0,
+    limite: parseInt(document.getElementById('cup-limite').value) || 999,
+    usos: 0,
+    validade: document.getElementById('cup-validade').value,
+    minimo: parseFloat(document.getElementById('cup-minimo').value) || 0,
+    ativo: true,
+  };
+  cupons.push(c);
+  saveToStorage();
+  renderCupons();
+  closeModal('modal-cupom');
+  notify('🏷️ Cupom ' + codigo + ' criado!', 'success');
+}
+
+function renderCupons() {
+  const tbody = document.getElementById('cupons-table');
+  if (!cupons.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text3);">Nenhum cupom criado.</td></tr>'; return; }
+  const tipos = { percent: '%', fixo: 'R$', frete: 'Frete' };
+  tbody.innerHTML = cupons.map(c => `
+    <tr>
+      <td class="td-mono" style="color:var(--accent);">${c.codigo}</td>
+      <td>${tipos[c.tipo] || c.tipo}</td>
+      <td class="td-mono">${c.tipo === 'frete' ? 'Grátis' : (c.tipo === 'percent' ? c.valor + '%' : 'R$ ' + c.valor.toFixed(2))}</td>
+      <td>${c.validade || '—'}</td>
+      <td>${c.usos}</td>
+      <td>${c.limite}</td>
+      <td><span class="badge ${c.ativo ? 'badge-green' : 'badge-red'}">${c.ativo ? 'Ativo' : 'Inativo'}</span></td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteCupom('${c.id}')">🗑️</button></td>
+    </tr>`).join('');
+}
+
+function deleteCupom(id) {
+  cupons = cupons.filter(c => c.id !== id);
+  saveToStorage();
+  renderCupons();
+  notify('🏷️ Cupom removido.', 'success');
+}
+
+// ── GAME CONFIG ──
+function saveMimoConfig() {
+  const cfg = {
+    freq: document.getElementById('m-freq').value,
+    tempo: document.getElementById('m-tempo').value,
+    brinde: document.getElementById('m-brinde').value,
+    valor: document.getElementById('m-valor').value,
+    validade: document.getElementById('m-validade').value,
+    qtd: document.getElementById('m-qtd').value,
+    exibicao: document.getElementById('m-exibicao').value,
+  };
+  storeData.mimogame = cfg;
+  saveToStorage();
+  // Atualizar labels
+  document.getElementById('mimo-freq-label').textContent = '1 a cada ' + cfg.freq + ' jogadas';
+  document.getElementById('mimo-brinde-label').textContent = 'Brinde: ' + (cfg.brinde || '—');
+  document.getElementById('mimo-validade-label').textContent = 'Validade: ' + (cfg.validade || '—');
+  closeModal('modal-mimogame');
+  notify('✅ MimoGame configurado!', 'success');
+}
+
+function saveSlotsConfig() {
+  storeData.slots = {
+    creditos: document.getElementById('s-creditos').value,
+    razao: document.getElementById('s-razao').value,
+  };
+  document.getElementById('slots-creditos-label').textContent = storeData.slots.creditos + ' créditos iniciais';
+  document.getElementById('slots-razao-label').textContent = storeData.slots.razao + ' créditos / R$1';
+  saveToStorage();
+  closeModal('modal-slots');
+  notify('✅ Slots configurado!', 'success');
+}
+
+function saveGameConfig() {
+  const mimoAtivo = document.getElementById('mimo-ativo').checked;
+  const slotsAtivo = document.getElementById('slots-ativo').checked;
+  document.getElementById('mimo-status-badge').textContent = mimoAtivo ? 'Ativo' : 'Inativo';
+  document.getElementById('mimo-status-badge').className = 'badge ' + (mimoAtivo ? 'badge-green' : 'badge-gray');
+  document.getElementById('slots-status-badge').textContent = slotsAtivo ? 'Ativo' : 'Inativo';
+  document.getElementById('slots-status-badge').className = 'badge ' + (slotsAtivo ? 'badge-green' : 'badge-gray');
+  saveToStorage();
+}
+
+async function loadGameStats() {
+  const storeId = document.getElementById('cfg-store-id')?.value;
+  const masterKey = document.getElementById('cfg-master-key')?.value;
+  if (!storeId || !masterKey) return;
+  try {
+    const r = await fetch(`${API_URL}/mimogame/stats/${storeId}`, { headers: { 'X-Master-Key': masterKey } });
+    const data = await r.json();
+    if (data.ok) {
+      document.getElementById('g-total').textContent = data.stats.totalJogadas;
+      document.getElementById('g-pendentes').textContent = data.stats.brindesPendentes;
+      document.getElementById('g-resgatados').textContent = data.stats.brindesResgatados;
+      document.getElementById('stat-jogadas').textContent = data.stats.totalJogadas;
+      document.getElementById('stat-brindes').textContent = data.stats.brindesPendentes + ' brindes pendentes';
+    }
+  } catch(e) {}
+}
+
+// ── CUSTOMIZATION ──
+function saveCustomization() {
+  storeData.nome = document.getElementById('c-nome').value;
+  storeData.slogan = document.getElementById('c-slogan').value;
+  storeData.logo = document.getElementById('c-logo').value;
+  storeData.fundo = document.getElementById('c-fundo').value;
+  storeData.corPrimaria = document.getElementById('c-cor1').value;
+  storeData.corSecundaria = document.getElementById('c-cor2').value;
+  storeData.musica = document.getElementById('c-musica').value;
+  storeData.volume = document.getElementById('c-volume').value;
+  document.getElementById('sidebar-store-name').textContent = storeData.nome || 'Minha Loja';
+  saveToStorage();
+  notify('🎨 Visual salvo! Publique para aplicar no Totem.', 'success');
+}
+
+function applyPreset(c1, c2) {
+  document.getElementById('c-cor1').value = c1;
+  document.getElementById('c-cor1-hex').value = c1;
+  document.getElementById('c-cor2').value = c2;
+  document.getElementById('c-cor2-hex').value = c2;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  ['c-cor1','c-cor2'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', e => {
+      document.getElementById(id + '-hex').value = e.target.value;
+    });
+  });
+});
+
+// ── CONFIG ──
+function saveConfig() {
+  storeData.whatsapp = document.getElementById('cfg-whatsapp').value;
+  storeData.status = document.getElementById('cfg-status').value;
+  storeData.segmento = document.getElementById('cfg-segmento').value;
+  storeData.apiUrl = document.getElementById('cfg-api').value;
+  storeData.storeId = document.getElementById('cfg-store-id').value;
+  saveToStorage();
+  notify('⚙️ Configurações salvas!', 'success');
+}
+
+async function testConnection() {
+  const url = document.getElementById('cfg-api').value || API_URL;
+  try {
+    notify('🔌 Testando conexão...', 'success');
+    const r = await fetch(url + '/status');
+    const d = await r.json();
+    if (d.ok) notify('✅ API conectada: ' + d.message, 'success');
+    else notify('⚠️ API respondeu mas com erro.', 'error');
+  } catch(e) {
+    notify('❌ Erro de conexão. Verifique a URL.', 'error');
+  }
+}
+
+// ── PUBLISH ──
+async function publishData() {
+  const storeId = document.getElementById('cfg-store-id')?.value || storeData.storeId;
+  const masterKey = document.getElementById('cfg-master-key')?.value;
+  if (!storeId) { notify('⚠️ Configure o Store ID em Configurações primeiro.', 'error'); return; }
+  if (!masterKey) { notify('⚠️ Configure a Master Key em Configurações primeiro.', 'error'); return; }
+
+  const payload = {
+    loja: storeData,
+    cardapio: buildCardapio(),
+    gamezone: { mimogame: storeData.mimogame, slots: storeData.slots },
+    atualizadoEm: new Date().toISOString(),
+  };
+
+  try {
+    notify('📡 Publicando...', 'success');
+    const r = await fetch(`${API_URL}/loja/${storeId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': masterKey },
+      body: JSON.stringify(payload),
+    });
+    const d = await r.json();
+    if (d.ok) notify('🚀 Dados publicados com sucesso!', 'success');
+    else notify('❌ Erro ao publicar: ' + d.error, 'error');
+  } catch(e) {
+    notify('❌ Erro de rede ao publicar.', 'error');
+  }
+}
+
+function buildCardapio() {
+  const cats = [...new Set(products.map(p => p.cat))];
+  return cats.map(cat => ({
+    categoriaNome: cat,
+    produtos: products.filter(p => p.cat === cat && p.ativo).map(p => ({
+      id: p.id, nome: p.nome, preco: p.preco, imagem: p.img, estoque: p.estoque, destaque: p.destaque, descricao: p.descricao,
+    }))
+  }));
+}
+
+// ── NOTIFY ──
+function notify(msg, type = 'success') {
+  const el = document.getElementById('notify');
+  const item = document.createElement('div');
+  item.className = 'notify-item ' + type;
+  item.innerHTML = msg;
+  el.appendChild(item);
+  setTimeout(() => item.remove(), 4000);
+}
+
+// ── FILTER ORDERS ──
+function filterOrders(status) {
+  // placeholder
+}
+</script>
+</body>
+</html>
